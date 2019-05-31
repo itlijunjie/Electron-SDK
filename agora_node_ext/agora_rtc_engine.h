@@ -38,6 +38,7 @@
 namespace agora {
     namespace rtc {
         using media::IExternalVideoRenderFactory;
+        using media::IVideoFrameObserver;
         using v8::Isolate;
         const int max_bmp_width = 500;
         const int max_bmp_height = 500;
@@ -282,6 +283,12 @@ namespace agora {
             NAPI_API(videosourceUpdateScreenCaptureParameters);
             NAPI_API(videosourceSetScreenCaptureContentHint);
 
+
+			/**
+			 * faceunity apis
+			 */
+			NAPI_API(initializeFaceUnity);
+			NAPI_API(updateFaceUnityOptions);
         public:
             Isolate* getIsolate() { return m_isolate; }
             IRtcEngine* getRtcEngine() { return m_engine; }
@@ -304,6 +311,7 @@ namespace agora {
 
 			AVideoDeviceManager* m_videoVdm = nullptr;
 			AAudioDeviceManager* m_audioVdm = nullptr;
+			IVideoFrameObserver* m_externalVideoFrameObserver = nullptr;
         };
 
 /*

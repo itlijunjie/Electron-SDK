@@ -4,7 +4,7 @@ import { List } from 'immutable';
 import path from 'path';
 import os from 'os'
 
-import {voiceChangerList, voiceReverbPreset, videoProfileList, audioProfileList, audioScenarioList, APP_ID, SHARE_ID, RTMP_URL, voiceReverbList } from '../utils/settings'
+import {AUTH_DATA, voiceChangerList, voiceReverbPreset, videoProfileList, audioProfileList, audioScenarioList, APP_ID, SHARE_ID, RTMP_URL, voiceReverbList } from '../utils/settings'
 import {readImage} from '../utils/base64'
 import WindowPicker from './components/WindowPicker/index.js'
 import DisplayPicker from './components/DisplayPicker/index.js'
@@ -38,11 +38,14 @@ export default class App extends Component {
         recordingTestOn: false,
         playbackTestOn: false,
         lastmileTestOn: false,
+        faceUnityOn: false,
         rtmpTestOn: false,
         windowList: [],
         displayList: [],
         encoderWidth: 0,
-        encoderHeight: 0
+        encoderHeight: 0,
+        fuBlur: 0,
+        fuColor: 0
       }
     }
     this.enableAudioMixing = false;
@@ -423,6 +426,30 @@ export default class App extends Component {
       })
   }
 
+  handleFuBlur = e => {
+    rtcEngine.updateFaceUnityOptions({color_level: this.state.fuColor, blur_level: this.state.fuBlur, is_beauty_on: 1.0})
+    this.setState({
+      fuBlur: Number(e.currentTarget.value)
+    })
+  }
+
+  handleFuColor = e => {
+    rtcEngine.updateFaceUnityOptions({color_level: this.state.fuColor, blur_level: this.state.fuBlur, is_beauty_on: 1.0})
+    this.setState({
+      fuColor: Number(e.currentTarget.value)
+    })
+  }
+
+  toggleFaceUnity = e => {
+    let rtcEngine = this.getRtcEngine()
+    if(AUTH_DATA.length !== 0) {
+      rtcEngine.initializeFaceUnity(AUTH_DATA)
+      rtcEngine.updateFaceUnityOptions({is_beauty_on: 1.0})
+    } else {
+      alert(`AUTH_DATA missing`)
+    }
+  }
+
   togglePlaybackTest = e => {
     let rtcEngine = this.getRtcEngine()
     if (!this.state.playbackTestOn) {
@@ -650,6 +677,20 @@ export default class App extends Component {
             <label className="label">Audio Recording Test</label>
             <div className="control">
               <button onClick={this.toggleRecordingTest} className="button is-link">{this.state.recordingTestOn ? 'stop' : 'start'}</button>
+            </div>
+          </div>
+          <div className="field group">
+            <label className="label">FaceUnity</label>
+            <div className="control">
+              <button onClick={this.toggleFaceUnity} className="button is-link">{this.state.faceUnityOn ? 'stop' : 'start'}</button>
+            </div>
+            Blur Level ({this.state.fuBlur})
+            <div className="control">
+              <input onChange={this.handleFuBlur} className="slider has-output is-fullwidth" min="0" max="10" value={this.state.fuBlur} step="0.1" type="range"></input>
+            </div>
+            Color Level ({this.state.fuColor})
+            <div className="control">
+              <input onChange={this.handleFuColor} className="slider has-output is-fullwidth" min="0" max="10" value={this.state.fuColor} step="0.1" type="range"></input>
             </div>
           </div>
         </div>

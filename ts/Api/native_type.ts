@@ -790,4 +790,27 @@ export interface NodeRtcEngine {
   onEvent(event: string, callback: Function): void;
   unsubscribe(uid: number): number;
   registerDeliverFrame(callback: Function): number;
+  initializeFaceUnity(authdata: Array<Number>): number;
+  updateFaceUnityOptions(options: {
+    filter_name: string,
+    filter_level: number,
+    color_level: number,
+    red_level: number,
+    blur_level: number,
+    skin_detect: number,
+    nonshin_blur_scale: number,
+    heavy_blur: number,
+    face_shape: number,
+    face_shape_level: number,
+    eye_enlarging: number,
+    cheek_thinning: number,
+    intensity_nose: number,
+    intensity_forehead: number,
+    intensity_mouth: number,
+    intensity_chin: number,
+    change_frames: number,
+    eye_bright: number,
+    tooth_whiten: number,
+    is_beauty_on: number
+  }): number;
 }

@@ -133,6 +133,7 @@
                     'CoreAudio.framework',
                     'Foundation.framework',
                     'AVFoundation.framework',
+                    'OpenGL.framework',
                     ]
                 },
                 'include_dirs': [
@@ -162,60 +163,64 @@
     {
         'target_name': 'agora_node_ext',
         'include_dirs': [
-        './common',
-        './common/libyuv/include'
+            './common',
+            './common/libyuv/include',
+            './agora_node_ext/common'
         ],
         'sources': [
-        './common/ipc_shm.h',
-        './common/node_log.cpp',
-        './common/node_log.h',
-        './common/video_source_ipc.cpp',
-        './common/video_source_ipc.h',
-        './common/node_event.h',
-        './common/node_event.cpp',
-        './common/node_process.h',
-        './common/node_error.h',
-        './agora_node_ext/agora_node_ext.cpp',
-        './agora_node_ext/agora_node_ext.h',
-        './agora_node_ext/agora_rtc_engine.cpp',
-        './agora_node_ext/agora_rtc_engine.h',
-        './agora_node_ext/agora_video_source.cpp',
-        './agora_node_ext/agora_video_source.h',
-        './agora_node_ext/node_async_queue.cpp',
-        './agora_node_ext/node_async_queue.h',
-        './agora_node_ext/node_event_handler.cpp',
-        './agora_node_ext/node_event_handler.h',
-        './agora_node_ext/node_napi_api.cpp',
-        './agora_node_ext/node_napi_api.h',
-        './agora_node_ext/node_uid.h',
-        './agora_node_ext/node_video_render.cpp',
-        './agora_node_ext/node_video_render.h',
-        './agora_node_ext/node_video_stream_channel.cpp',
-        './agora_node_ext/node_video_stream_channel.h',
-        './common/libyuv/source/compare_common.cc',
-        './common/libyuv/source/compare.cc',
-        './common/libyuv/source/convert_argb.cc',
-        './common/libyuv/source/convert_from_argb.cc',
-        './common/libyuv/source/convert_from.cc',
-        './common/libyuv/source/convert_jpeg.cc',
-        './common/libyuv/source/convert_to_argb.cc',
-        './common/libyuv/source/convert_to_i420.cc',
-        './common/libyuv/source/convert.cc',
-        './common/libyuv/source/cpu_id.cc',
-        './common/libyuv/source/mjpeg_decoder.cc',
-        './common/libyuv/source/mjpeg_validate.cc',
-        './common/libyuv/source/planar_functions.cc',
-        './common/libyuv/source/rotate_any.cc',
-        './common/libyuv/source/rotate_argb.cc',
-        './common/libyuv/source/rotate_common.cc',
-        './common/libyuv/source/rotate.cc',
-        './common/libyuv/source/row_any.cc',
-        './common/libyuv/source/row_common.cc',
-        './common/libyuv/source/scale_any.cc',
-        './common/libyuv/source/scale_argb.cc',
-        './common/libyuv/source/scale_common.cc',
-        './common/libyuv/source/scale.cc',
-        './common/libyuv/source/video_common.cc'
+            './common/ipc_shm.h',
+            './common/node_log.cpp',
+            './common/node_log.h',
+            './common/video_source_ipc.cpp',
+            './common/video_source_ipc.h',
+            './common/node_event.h',
+            './common/node_event.cpp',
+            './common/node_process.h',
+            './common/node_error.h',
+            './agora_node_ext/agora_node_ext.cpp',
+            './agora_node_ext/agora_node_ext.h',
+            './agora_node_ext/agora_rtc_engine.cpp',
+            './agora_node_ext/agora_rtc_engine.h',
+            './agora_node_ext/agora_video_source.cpp',
+            './agora_node_ext/agora_video_source.h',
+            './agora_node_ext/node_async_queue.cpp',
+            './agora_node_ext/node_async_queue.h',
+            './agora_node_ext/node_event_handler.cpp',
+            './agora_node_ext/node_event_handler.h',
+            './agora_node_ext/node_napi_api.cpp',
+            './agora_node_ext/node_napi_api.h',
+            './agora_node_ext/node_uid.h',
+            './agora_node_ext/node_video_render.cpp',
+            './agora_node_ext/node_video_render.h',
+            './agora_node_ext/node_video_frame.cpp',
+            './agora_node_ext/node_video_frame.h',
+            './agora_node_ext/node_video_stream_channel.cpp',
+            './agora_node_ext/node_video_stream_channel.h',
+            './common/libyuv/source/compare_common.cc',
+            './common/libyuv/source/compare.cc',
+            './common/libyuv/source/convert_argb.cc',
+            './common/libyuv/source/convert_from_argb.cc',
+            './common/libyuv/source/convert_from.cc',
+            './common/libyuv/source/convert_jpeg.cc',
+            './common/libyuv/source/convert_to_argb.cc',
+            './common/libyuv/source/convert_to_i420.cc',
+            './common/libyuv/source/convert.cc',
+            './common/libyuv/source/cpu_id.cc',
+            './common/libyuv/source/mjpeg_decoder.cc',
+            './common/libyuv/source/mjpeg_validate.cc',
+            './common/libyuv/source/planar_functions.cc',
+            './common/libyuv/source/rotate_any.cc',
+            './common/libyuv/source/rotate_argb.cc',
+            './common/libyuv/source/rotate_common.cc',
+            './common/libyuv/source/rotate.cc',
+            './common/libyuv/source/row_any.cc',
+            './common/libyuv/source/row_common.cc',
+            './common/libyuv/source/scale_any.cc',
+            './common/libyuv/source/scale_argb.cc',
+            './common/libyuv/source/scale_common.cc',
+            './common/libyuv/source/scale.cc',
+            './common/libyuv/source/video_common.cc',
+            './agora_node_ext/common/Utils.cpp',
         ],
         'conditions': [
             [
@@ -225,18 +230,22 @@
                     'destination': '<(PRODUCT_DIR)',
                     'files': [
                         './sdk/dll/agora_rtc_sdk.dll',
-                        './sdk/dll/agora_sig_sdk.dll'
+                        './sdk/dll/agora_sig_sdk.dll',
+                        './common/FULive/win/Win32/nama.dll',
+                        './common/FULive/win/Win32/libsgemm.dll'
                     ]
                 }],
                 'library_dirs': [
                     './sdk/lib/win',
+                    './common/FULive/win/Win32',
                 ],
                 'link_settings': {
                     'libraries': [
                         '-lagora_rtc_sdk.lib',
                         '-lws2_32.lib',
                         '-lRpcrt4.lib',
-						'-lgdiplus.lib'
+						'-lgdiplus.lib',
+						'-lnama.lib'
                     ]
                 },
                 'defines!': [
@@ -254,7 +263,8 @@
                     './agora_node_ext/node_screen_window_info.h'
                 ],
                 'include_dirs': [
-                './sdk/include'
+                    './sdk/include',
+                    './common/FULive/win/include'
                 ],
                 'configurations': {
                     'Release': {
@@ -284,7 +294,7 @@
             'OS=="mac"',
             {
                 'mac_framework_dirs': [
-                '../sdk/lib/mac'
+                    '../sdk/lib/mac',
                 ],
                 'link_settings': {
                     'libraries': [
@@ -304,7 +314,8 @@
                     'AudioToolbox.framework',
                     'CoreAudio.framework',
                     'Foundation.framework',
-                    'AVFoundation.framework'
+                    'AVFoundation.framework',
+                    'libnama.a'
                     ]
                 },
                 'sources': [
@@ -317,7 +328,8 @@
                     './agora_node_ext/node_screen_window_info.h'
                 ],
                 'include_dirs': [
-                './sdk/lib/mac/AgoraRtcEngineKit.framework/Headers'
+                    './sdk/lib/mac/AgoraRtcEngineKit.framework/Headers',
+                    './common/FULive/mac/Headers'
                 ],
                 'defines!': [
                     '_NOEXCEPT',
@@ -327,7 +339,10 @@
                     'MACOSX_DEPLOYMENT_TARGET': '10.11',
                     'EXECUTABLE_EXTENSION': 'node',
                     'FRAMEWORK_SEARCH_PATHS': [
-                    './sdk/lib/mac'
+                        './sdk/lib/mac'
+                    ],
+                    'LIBRARY_SEARCH_PATHS': [
+                        './common/FULive/mac/lib'
                     ]
                 },
             }

@@ -10,6 +10,7 @@
 
 #include "agora_rtc_engine.h"
 #include "node_video_render.h"
+#include "node_video_frame.h"
 #include "node_uid.h"
 #include "agora_video_source.h"
 #include "node_napi_api.h"
@@ -222,6 +223,11 @@ namespace agora {
                 PROPERTY_METHOD_DEFINE(videosourceStartScreenCaptureByWindow);
                 PROPERTY_METHOD_DEFINE(videosourceUpdateScreenCaptureParameters);
                 PROPERTY_METHOD_DEFINE(videosourceSetScreenCaptureContentHint);
+
+				//face unity apis
+				PROPERTY_METHOD_DEFINE(initializeFaceUnity);
+				PROPERTY_METHOD_DEFINE(updateFaceUnityOptions);
+				
             EN_PROPERTY_DEFINE()
             module->Set(String::NewFromUtf8(isolate, "NodeRtcEngine"), tpl->GetFunction());
         }
@@ -285,6 +291,11 @@ namespace agora {
                 m_engine->release();
                 m_engine = nullptr;
             }
+
+			if (m_externalVideoFrameObserver) {
+				delete m_externalVideoFrameObserver;
+				m_externalVideoFrameObserver = nullptr;
+			}
             m_videoSourceSink.reset(nullptr);
             m_externalVideoRenderFactory.reset(nullptr);
             m_eventHandler.reset(nullptr);
@@ -4075,5 +4086,133 @@ namespace agora {
             } while (false);
             LOG_LEAVE;
         }
+
+		NAPI_API_DEFINE(NodeRtcEngine, initializeFaceUnity)
+		{
+			LOG_ENTER;
+			do {
+				NodeRtcEngine *pEngine = nullptr;
+				napi_get_native_this(args, pEngine);
+				CHECK_NATIVE_THIS(pEngine);
+
+				Isolate* isolate = pEngine->getIsolate();
+
+				agora::util::AutoPtr<agora::media::IMediaEngine> pMediaEngine;
+				pMediaEngine.queryInterface(pEngine->m_engine, AGORA_IID_MEDIA_ENGINE);
+
+				if (!pEngine->m_externalVideoFrameObserver) {
+					Local<v8::Array> auth;
+					if (args[0]->IsArray()) {
+						auth = Local<v8::Array>::Cast(args[0]);
+						int authLength = auth->Length();
+						char* authdata = new char[authLength];
+						for (int i = 0; i < authLength; i++) {
+							int v = (int)auth->Get(i)->NumberValue();
+							authdata[i] = (char)v;
+						}
+
+						pEngine->m_externalVideoFrameObserver = new NodeVideoFrameObserver(authdata, authLength);
+						pMediaEngine->registerVideoFrameObserver(pEngine->m_externalVideoFrameObserver);
+						delete authdata;
+					}
+				}
+			} while (false);
+
+			napi_set_int_result(args, 0);
+			LOG_LEAVE;
+		}
+
+		NAPI_API_DEFINE(NodeRtcEngine, updateFaceUnityOptions)
+		{
+			LOG_ENTER;
+			napi_status status = napi_ok;
+			int result = -1;
+			do {
+				Isolate *isolate = args.GetIsolate();
+				NodeRtcEngine *pEngine = nullptr;
+				napi_get_native_this(args, pEngine);
+				CHECK_NATIVE_THIS(pEngine);
+
+				if (!pEngine->m_externalVideoFrameObserver) {
+					break;
+				}
+
+				if (!args[0]->IsObject()) {
+					status = napi_invalid_arg;
+					CHECK_NAPI_STATUS(pEngine, status);
+				}
+
+				Local<Object> obj = args[0]->ToObject();
+
+				FaceUnityOptions opts;
+				nodestring filter_name;
+
+				status = napi_get_object_property_nodestring_(isolate, obj, "filter_name", filter_name);
+				opts.filter_name = filter_name;
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "filter_level", opts.filter_level);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "color_level", opts.color_level);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "red_level", opts.red_level);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "blur_level", opts.blur_level);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "skin_detect", opts.skin_detect);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "nonshin_blur_scale", opts.nonshin_blur_scale);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "heavy_blur", opts.heavy_blur);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "face_shape", opts.face_shape);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "face_shape_level", opts.face_shape_level);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "eye_enlarging", opts.eye_enlarging);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "cheek_thinning", opts.cheek_thinning);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "intensity_nose", opts.intensity_nose);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "intensity_forehead", opts.intensity_forehead);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "intensity_mouth", opts.intensity_mouth);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "intensity_chin", opts.intensity_chin);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "change_frames", opts.change_frames);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "eye_bright", opts.eye_bright);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "tooth_whiten", opts.tooth_whiten);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				status = napi_get_object_property_double_(isolate, obj, "is_beauty_on", opts.is_beauty_on);
+				CHECK_NAPI_STATUS(pEngine, status);
+
+				NodeVideoFrameObserver * fu = reinterpret_cast<NodeVideoFrameObserver*>(pEngine->m_externalVideoFrameObserver);
+				result = fu->setFaceUnityOptions(opts);
+			} while (false);
+			napi_set_int_result(args, result);
+			LOG_LEAVE;
+		}
     }
 }
